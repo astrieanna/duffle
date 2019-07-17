@@ -77,18 +77,12 @@ type LocationRef struct {
 
 // BaseImage contains fields shared across image types
 type BaseImage struct {
-	ImageType string         `json:"imageType" mapstructure:"imageType"`
-	Image     string         `json:"image" mapstructure:"image"`
-	Digest    string         `json:"digest,omitempty" mapstructure:"digest"`
-	Size      uint64         `json:"size,omitempty" mapstructure:"size"`
-	Platform  *ImagePlatform `json:"platform,omitempty" mapstructure:"platform"`
-	MediaType string         `json:"mediaType,omitempty" mapstructure:"mediaType"`
-}
-
-// ImagePlatform indicates what type of platform an image is built for
-type ImagePlatform struct {
-	Architecture string `json:"architecture,omitempty" mapstructure:"architecture"`
-	OS           string `json:"os,omitempty" mapstructure:"os"`
+	ImageType string            `json:"imageType" mapstructure:"imageType"`
+	Image     string            `json:"image" mapstructure:"image"`
+	Digest    string            `json:"digest,omitempty" mapstructure:"digest"`
+	Size      uint64            `json:"size,omitempty" mapstructure:"size"`
+	Labels    map[string]string `json:"labels,omitempty" mapstructure:"labels"`
+	MediaType string            `json:"mediaType,omitempty" mapstructure:"mediaType"`
 }
 
 // Image describes a container image in the bundle
@@ -101,6 +95,11 @@ type Image struct {
 type InvocationImage struct {
 	BaseImage `mapstructure:",squash"`
 }
+
+// Map that stores the relocated images
+// The key is the Image in bundle.json and the value is the new Image
+// from the relocated registry
+type ImageRelocationMap map[string]string
 
 // Location provides the location where a value should be written in
 // the invocation image.
@@ -135,11 +134,16 @@ type Action struct {
 
 // ValuesOrDefaults returns parameter values or the default parameter values
 func ValuesOrDefaults(vals map[string]interface{}, b *Bundle) (map[string]interface{}, error) {
+	res := map[string]interface{}{}
+
+	if b.Parameters == nil {
+		return res, nil
+	}
+
 	requiredMap := map[string]struct{}{}
 	for _, key := range b.Parameters.Required {
 		requiredMap[key] = struct{}{}
 	}
-	res := map[string]interface{}{}
 
 	for name, def := range b.Parameters.Fields {
 		s, ok := b.Definitions[def.Definition]

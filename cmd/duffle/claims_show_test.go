@@ -20,6 +20,16 @@ func TestDisplayClaim(t *testing.T) {
 		Bundle: &bundle.Bundle{
 			Name:    "mybundle",
 			Version: "0.1.2",
+			Outputs: &bundle.OutputsDefinition{
+				Fields: map[string]bundle.OutputDefinition{
+					"some-output": bundle.OutputDefinition{
+						Path: "/some-output-path",
+					},
+				},
+			},
+		},
+		Outputs: map[string]string{
+			"some-output": "some output contents",
 		},
 	})
 
@@ -33,6 +43,7 @@ func TestDisplayClaim(t *testing.T) {
 	is := assert.New(t)
 	is.Equal("myclaim", got.Name)
 	is.Equal("mybundle", got.Bundle.Name)
+	is.Equal("some output contents", got.Outputs["some-output"])
 }
 
 func TestDisplayClaim_Bundle(t *testing.T) {
