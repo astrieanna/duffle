@@ -129,7 +129,7 @@ type driverWithRelocationMapping struct {
 	relMapping string
 }
 
-func (d *driverWithRelocationMapping) Run(op *driver.Operation) error {
+func (d *driverWithRelocationMapping) Run(op *driver.Operation) (driver.OperationResult, error) {
 	// if there is a relocation mapping, ensure it is mounted
 	if d.relMapping != "" {
 		op.Files["/cnab/app/relocation-mapping.json"] = d.relMapping

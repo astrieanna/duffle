@@ -24,13 +24,21 @@ func (i *Install) Run(c *claim.Claim, creds credentials.Set, w io.Writer) error 
 	if err != nil {
 		return err
 	}
-	if err := i.Driver.Run(op); err != nil {
+
+	opResult, err := i.Driver.Run(op)
+	// Update outputs in claim
+	c.Outputs = map[string]string{}
+	for outputName, v := range c.Bundle.Outputs.Fields {
+		if opResult.Outputs[v.Path] != "" {
+			c.Outputs[outputName] = opResult.Outputs[v.Path]
+		}
+	}
+
+	if err != nil {
 		c.Update(claim.ActionInstall, claim.StatusFailure)
 		c.Result.Message = err.Error()
 		return err
 	}
-
-	// Update claim:
 	c.Update(claim.ActionInstall, claim.StatusSuccess)
 	return nil
 }

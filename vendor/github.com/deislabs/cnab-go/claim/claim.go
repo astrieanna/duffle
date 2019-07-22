@@ -67,6 +67,7 @@ func New(name string) (*Claim, error) {
 			Action: ActionUnknown,
 			Status: StatusUnknown,
 		},
+		Outputs:       map[string]string{},
 		Parameters:    map[string]interface{}{},
 		RelocationMap: bundle.ImageRelocationMap{},
 	}, nil

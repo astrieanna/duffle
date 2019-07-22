@@ -24,7 +24,15 @@ func (u *Upgrade) Run(c *claim.Claim, creds credentials.Set, w io.Writer) error 
 	if err != nil {
 		return err
 	}
-	if err := u.Driver.Run(op); err != nil {
+	opResult, err := u.Driver.Run(op)
+	c.Outputs = map[string]string{}
+	for outputName, v := range c.Bundle.Outputs.Fields {
+		if opResult.Outputs[v.Path] != "" {
+			c.Outputs[outputName] = opResult.Outputs[v.Path]
+		}
+	}
+
+	if err != nil {
 		c.Update(claim.ActionUpgrade, claim.StatusFailure)
 		c.Result.Message = err.Error()
 		return err

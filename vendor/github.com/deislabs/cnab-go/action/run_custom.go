@@ -48,7 +48,7 @@ func (i *RunCustom) Run(c *claim.Claim, creds credentials.Set, w io.Writer) erro
 		return err
 	}
 
-	err = i.Driver.Run(op)
+	opResult, err := i.Driver.Run(op)
 
 	// If this action says it does not modify the release, then we don't track
 	// it in the claim. Otherwise, we do.
@@ -60,6 +60,13 @@ func (i *RunCustom) Run(c *claim.Claim, creds credentials.Set, w io.Writer) erro
 	if err != nil {
 		c.Result.Message = err.Error()
 		status = claim.StatusFailure
+	}
+
+	c.Outputs = map[string]string{}
+	for outputName, v := range c.Bundle.Outputs.Fields {
+		if opResult.Outputs[v.Path] != "" {
+			c.Outputs[outputName] = opResult.Outputs[v.Path]
+		}
 	}
 
 	c.Update(i.Action, status)
