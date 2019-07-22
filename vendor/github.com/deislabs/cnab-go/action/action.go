@@ -99,8 +99,10 @@ func opFromClaim(action string, stateless bool, c *claim.Claim, ii bundle.Invoca
 	env["CNAB_BUNDLE_VERSION"] = c.Bundle.Version
 
 	var outputs []string
-	for k := range c.Bundle.Outputs.Fields {
-		outputs = append(outputs, c.Bundle.Outputs.Fields[k].Path)
+	if c.Bundle.Outputs != nil {
+		for k := range c.Bundle.Outputs.Fields {
+			outputs = append(outputs, c.Bundle.Outputs.Fields[k].Path)
+		}
 	}
 
 	return &driver.Operation{

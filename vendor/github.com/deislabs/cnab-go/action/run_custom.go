@@ -63,9 +63,11 @@ func (i *RunCustom) Run(c *claim.Claim, creds credentials.Set, w io.Writer) erro
 	}
 
 	c.Outputs = map[string]string{}
-	for outputName, v := range c.Bundle.Outputs.Fields {
-		if opResult.Outputs[v.Path] != "" {
-			c.Outputs[outputName] = opResult.Outputs[v.Path]
+	if c.Bundle.Outputs != nil {
+		for outputName, v := range c.Bundle.Outputs.Fields {
+			if opResult.Outputs[v.Path] != "" {
+				c.Outputs[outputName] = opResult.Outputs[v.Path]
+			}
 		}
 	}
 

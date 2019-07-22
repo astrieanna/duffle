@@ -61,7 +61,8 @@
 
 [[constraint]]
   name = "github.com/deislabs/cnab-go"
-  branch = "spike-outputs-on-k8s"
+  #branch = "spike-outputs-on-k8s"
+  revision = "ad6279e6a76923cbc0018cfceb1874305f31c671"
   source = "github.com/astrieanna/cnab-go"
 
 [[override]]
